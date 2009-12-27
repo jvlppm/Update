@@ -56,15 +56,12 @@ namespace Update
 			return fileInfos;
 		}
 
-		public void UpdateFiles()
+		public void DownloadFile(string file)
 		{
-			foreach(string file in OutdatedFiles())
-			{
-				Client.DownloadFile(BaseUrl + "/" + file, file);
-			}
+			Client.DownloadFile(BaseUrl + "/" + file, file);
 		}
 
-		List<string> OutdatedFiles()
+		public List<string> OutdatedFiles()
 		{
 			List<string> files = new List<string>();
 

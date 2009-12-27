@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Update
 {
@@ -8,8 +9,22 @@ namespace Update
 		{
 			try
 			{
+				double lastUpdate = 0;
 				Updater updater = new Updater();
-				updater.UpdateFiles();	
+				Console.Write("Loading => ");
+				int maxBarSize = Console.WindowWidth - Console.CursorLeft;
+
+				int updatedFiles = 1;
+				List<string> updateFiles = updater.OutdatedFiles();
+				foreach (string file in updateFiles)
+				{
+					updater.DownloadFile(file);
+
+					double atualPercentage = updatedFiles++ / ((double)updateFiles.Count);
+					for (int i = 1; i < (atualPercentage - lastUpdate) * maxBarSize; i++)
+						Console.Write("#");
+					lastUpdate = atualPercentage;
+				}
 			}
 			catch(Exception ex)
 			{
