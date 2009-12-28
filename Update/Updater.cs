@@ -23,32 +23,27 @@ namespace Update
 		static readonly WebClient Client = new WebClient();
 		static readonly HashAlgorithm Hasher = new MD5CryptoServiceProvider();
 
-		readonly XDocument _settings;
-		readonly Dictionary<string, FileInfo> _serverFileInfos;
+		readonly XDocument _modules;
+		readonly Dictionary<string, FileInfo> _serverFiles;
 
 		string BaseUrl { get; set; }
-		string AppInfoPath { get; set; }
 
 		public Updater()
 		{
-			_settings = XDocument.Load("update.xml");
+			BaseUrl = Settings.ReadValue("Update", "BaseUrl");
 
-			BaseUrl = _settings.Root.Attribute("BaseUrl").Value;
-			AppInfoPath = _settings.Root.Attribute("AppInfo").Value;
-
-			_serverFileInfos = GetServerFileInfos(BaseUrl, AppInfoPath);
+			_modules = XDocument.Load(new StreamReader(Client.OpenRead(BaseUrl + "/Modules.xml")));
+			_serverFiles = GetServerFileInfos(BaseUrl + "/Files.txt");
 		}
 
-		static Dictionary<string, FileInfo> GetServerFileInfos(string address, string appInfoPath)
+		static Dictionary<string, FileInfo> GetServerFileInfos(string address)
 		{
 			Dictionary<string, FileInfo> fileInfos = new Dictionary<string, FileInfo>();
 			
 			address = address.TrimEnd('/');
 			try
 			{
-				WebClient client = new WebClient();
-				Stream strm = client.OpenRead(string.Format("{0}/{1}", address, appInfoPath));
-				StreamReader sr = new StreamReader(strm);
+				StreamReader sr = new StreamReader(Client.OpenRead(address));
 
 				do
 				{
@@ -76,7 +71,14 @@ namespace Update
 					Directory.CreateDirectory(currentDirectory);
 			}
 
-			Client.DownloadFile(BaseUrl + "/" + file, file);
+			try
+			{
+				Client.DownloadFile(BaseUrl + "/" + file, file);
+			}
+			catch(Exception ex)
+			{
+				throw new Exception(string.Format("File could not be downloaded: \"{0}\"", file), ex);
+			}
 		}
 
 		public List<string> OutdatedFiles()
@@ -85,10 +87,10 @@ namespace Update
 
 			foreach (FileInfo file in GetFileList())
 			{
-				if (!_serverFileInfos.ContainsKey(file.Path))
+				if (!_serverFiles.ContainsKey(file.Path))
 					throw new Exception("File not available in server info: \"" + file.Path + "\"");
 
-				if(File.Exists(file.Path) && (!file.CheckUpdates || ComputeHash(file.Path) == _serverFileInfos[file.Path].Hash))
+				if(File.Exists(file.Path) && (!file.CheckUpdates || ComputeHash(file.Path) == _serverFiles[file.Path].Hash))
 					continue;
 
 				if(!files.ContainsKey(file.Zip))
@@ -111,9 +113,9 @@ namespace Update
 				{
 					long totalSize = 0;
 					foreach (var file in module.Value)
-						totalSize += _serverFileInfos[file.Path].Size;
+						totalSize += _serverFiles[file.Path].Size;
 
-					if (totalSize > _serverFileInfos[module.Key].Size)
+					if (totalSize > _serverFiles[module.Key].Size)
 						addZip = true;
 				}
 				if (addZip)
@@ -142,9 +144,17 @@ namespace Update
 		List<FileInfo> GetFileList()
 		{
 			List<FileInfo> files = new List<FileInfo>();
-			var globalDependencies = from dependency in _settings.Descendants("Dependency").Attributes("Module")
-									 where dependency.Parent.Parent == _settings.Root
-									 select dependency.Value;
+			var globalDependencies =
+				_modules.Descendants("Download").Attributes("Module").Where(download =>
+					{
+						string localStatus = Settings.ReadValue(download.Value, "Enabled");
+						if (!string.IsNullOrEmpty(localStatus))
+							return bool.Parse(localStatus);
+
+						var serverStatus = download.Parent.Attribute("EnabledByDefault");
+						return serverStatus == null || bool.Parse(serverStatus.Value);
+					}
+				).Select(dependency => dependency.Value);
 
 			foreach (string globalDependency in globalDependencies)
 				GetModuleFiles(globalDependency, files);
@@ -154,7 +164,7 @@ namespace Update
 
 		void GetModuleFiles(string moduleName, ICollection<FileInfo> files)
 		{
-			XElement module = _settings.Descendants("Module").Where( m => m.Attribute("Name").Value == moduleName).First();
+			XElement module = _modules.Descendants("Module").Where( m => m.Attribute("Name").Value == moduleName).First();
 			var moduleFiles = module.Descendants("File").Select(file => new FileInfo{
          		Path = file.Attribute("Path").Value,
 				CheckUpdates = file.Attribute("CheckUpdates") != null? bool.Parse(file.Attribute("CheckUpdates").Value): true,
@@ -172,7 +182,7 @@ namespace Update
 				}
 			}
 
-			var dependencies = from dependency in _settings.Descendants("Dependency")
+			var dependencies = from dependency in _modules.Descendants("Dependency")
 							   where dependency.Parent.Attribute("Name") != null &&
 									 dependency.Parent.Attribute("Name").Value == moduleName
 							   select dependency.Attribute("Module").Value;

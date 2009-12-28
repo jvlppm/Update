@@ -10,25 +10,20 @@ namespace AppInfoCreator
 		static readonly HashAlgorithm Hasher = new MD5CryptoServiceProvider();
 		public static string ComputeHash(string path)
 		{
-			try
+			StringBuilder localHash = new StringBuilder();
+			using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
 			{
-				StringBuilder localHash = new StringBuilder();
-				if (!File.Exists(path)) return null;
-				using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
+				foreach (byte hashByte in Hasher.ComputeHash(f))
 				{
-					foreach (byte hashByte in Hasher.ComputeHash(f))
-					{
-						localHash.Append(string.Format("{0:x2}", hashByte));
-					}
+					localHash.Append(string.Format("{0:x2}", hashByte));
 				}
-				return localHash.ToString();
 			}
-			catch { return null; }
+			return localHash.ToString();
 		}
 
 		static void Main()
 		{
-			StreamWriter output = new StreamWriter("files.txt");
+			StreamWriter output = new StreamWriter("Files.txt");
 
 			DirectoryInfo dir = new DirectoryInfo(".");
 
