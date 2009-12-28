@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -30,7 +31,12 @@ namespace AppInfoCreator
 			StreamWriter output = new StreamWriter("files.txt");
 
 			DirectoryInfo dir = new DirectoryInfo(".");
-			foreach(var file in dir.GetFiles("*.dll"))
+
+			List<FileInfo> files = new List<FileInfo>();
+			files.AddRange(dir.GetFiles("*.dll"));
+			files.AddRange(dir.GetFiles("*.zip"));
+
+			foreach(var file in files)
 			{
 				output.WriteLine("{0} {1}", ComputeHash(file.FullName) , file.Name);
 			}

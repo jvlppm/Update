@@ -19,6 +19,8 @@ namespace Update
 				foreach (string file in updateFiles)
 				{
 					updater.DownloadFile(file);
+					if(file.EndsWith(".zip"))
+						Zip.UnZipFiles(file, ".", "", false);
 
 					double atualPercentage = updatedFiles++ / ((double)updateFiles.Count);
 					for (int i = 1; i < (atualPercentage - lastUpdate) * maxBarSize; i++)
