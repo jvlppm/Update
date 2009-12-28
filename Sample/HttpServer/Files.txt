@@ -1,0 +1,15 @@
+18141fd77fe45a01736be2442aeb96b1 Jv.Networking.dll 8192
+5391320bd1356eca910e65da22fa8d1e Jv.Plugins.dll 24576
+f33af41f86e68a8c3f75c722437a12e8 Jv.Threading.dll 12800
+43fd68206f9cc324b054a23778edacc5 MSNPSharp.dll 564224
+14a36de09211e6d0e86268b5473405ff q2Tool.Plugin.CopyBinds.dll 23552
+3fa2994fabf585e31257b2f240fda9d9 q2Tool.Plugin.ForceProxy.dll 5120
+0882cd225e69d946d4457c3ee9dfe98c q2Tool.Plugin.NoDarkMatch.dll 5632
+82ce7a6df8b7dd2f154e2a47b8edbe17 q2Tool.Plugin.PredictPlayer.dll 7680
+c163719833f848375add69c0f2a640f9 q2Tool.Plugin.SayTeamMessages.dll 7680
+9c9889e093712bb6af7cb1a501a252c1 q2Tool.Plugin.ShowMsnMessages.dll 8192
+a11a56dfa2bf2614b2e89aeec5af51ee q2Tool.Program.dll 28160
+9176c14ae2424134db8ef26f1871b03e JvLib.zip 20095
+3d43c5e1e8ededd8653f171a2fefcc1a q2Tool.zip 16496
+ffe49f9267c40a96817cac3d4d2ae8d9 ShowMsnMessages.zip 211662
+947031a9be4c5ac309a86812a2de97f2 q2Tool.exe 16497

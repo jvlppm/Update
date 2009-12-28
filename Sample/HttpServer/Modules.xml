@@ -1,0 +1,21 @@
+<Modules>
+	<Download Module="q2Tool"/>
+	<Download EnabledByDefault="False" Module="ShowMsnMessages"/>
+
+	<Module Name="q2Tool" Zip="q2Tool.zip">
+		<Dependency Module="JvLib"/>
+		<File Path="q2Tool.exe"/>
+		<File Path="q2Tool.Program.dll"/>
+	</Module>
+	
+	<Module Name="JvLib" Zip="JvLib.zip">
+		<File Path="Jv.Networking.dll"/>
+		<File Path="Jv.Threading.dll"/>
+		<File Path="Jv.Plugins.dll"/>
+	</Module>
+	
+	<Module Name="ShowMsnMessages" Zip="ShowMsnMessages.zip">
+		<File Path="q2Tool.Plugin.ShowMsnMessages.dll"/>
+		<File Path="MSNPSharp.dll"/>
+	</Module>
+</Modules>
