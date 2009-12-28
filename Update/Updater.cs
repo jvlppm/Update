@@ -9,16 +9,24 @@ using System.Xml.Linq;
 
 namespace Update
 {
+	class FileInfo
+	{
+		public string Hash { get; set; }
+		public long Size { get; set; }
+		public string Path { get; set; }
+		public string Zip { get; set; }
+	}
+
 	public class Updater
 	{
 		static readonly WebClient Client = new WebClient();
 		static readonly HashAlgorithm Hasher = new MD5CryptoServiceProvider();
 
 		readonly XDocument _settings;
-		readonly Dictionary<string, string> _fileHash;
+		readonly Dictionary<string, FileInfo> _serverFileInfos;
 
-		public string BaseUrl { get; private set; }
-		public string AppInfoPath { get; private set; }
+		string BaseUrl { get; set; }
+		string AppInfoPath { get; set; }
 
 		public Updater()
 		{
@@ -27,12 +35,12 @@ namespace Update
 			BaseUrl = _settings.Root.Attribute("BaseUrl").Value;
 			AppInfoPath = _settings.Root.Attribute("AppInfo").Value;
 
-			_fileHash = GetFileInfos(BaseUrl, AppInfoPath);
+			_serverFileInfos = GetServerFileInfos(BaseUrl, AppInfoPath);
 		}
 
-		static Dictionary<string, string> GetFileInfos(string address, string appInfoPath)
+		static Dictionary<string, FileInfo> GetServerFileInfos(string address, string appInfoPath)
 		{
-			Dictionary<string, string> fileInfos = new Dictionary<string, string>();
+			Dictionary<string, FileInfo> fileInfos = new Dictionary<string, FileInfo>();
 			
 			address = address.TrimEnd('/');
 			try
@@ -44,7 +52,7 @@ namespace Update
 				do
 				{
 					string[] line = sr.ReadLine().Split(' ');
-					fileInfos.Add(line[1], line[0]);
+					fileInfos.Add(line[1], new FileInfo{ Hash = line[0], Size = long.Parse(line[2])});
 				}
 				while (!sr.EndOfStream);
 			}
@@ -58,25 +66,68 @@ namespace Update
 
 		public void DownloadFile(string file)
 		{
+			string currentDirectory = string.Empty;
+			string[] directories = file.Split('/');
+			for (int i = 0; i < directories.Length - 1; i++ )
+			{
+				currentDirectory += directories[i] + "/";
+				if (!Directory.Exists(currentDirectory))
+					Directory.CreateDirectory(currentDirectory);
+			}
+
 			Client.DownloadFile(BaseUrl + "/" + file, file);
 		}
 
 		public List<string> OutdatedFiles()
 		{
-			List<string> files = new List<string>();
+			Dictionary<string, List<FileInfo>> files = new Dictionary<string, List<FileInfo>>();
 
-			foreach(string file in GetFileList())
+			foreach (FileInfo file in GetFileList())
 			{
-				if (!_fileHash.ContainsKey(file))
+				if (!_serverFileInfos.ContainsKey(file.Path))
 					throw new Exception("File not available in server info: \"" + file + "\"");
 
-				if (ComputeHash(file) != _fileHash[file])
-					files.Add(file);
+				if (ComputeHash(file.Path) != _serverFileInfos[file.Path].Hash)
+				{
+					if(!files.ContainsKey(file.Zip))
+						files.Add(file.Zip, new List<FileInfo>());
+
+					files[file.Zip].Add(file);
+				}
 			}
-			return files;
+
+			return UpdateFileList(files);
 		}
 
-		public static string ComputeHash(string path)
+		List<string> UpdateFileList(Dictionary<string, List<FileInfo>> modules)
+		{
+			List<string> updateFiles = new List<string>();
+
+			foreach(var module in modules)
+			{
+				bool addZip = false;
+				if(!string.IsNullOrEmpty(module.Key))
+				{
+					long totalSize = 0;
+					foreach (var file in module.Value)
+						totalSize += _serverFileInfos[file.Path].Size;
+
+					if (totalSize > _serverFileInfos[module.Key].Size)
+						addZip = true;
+				}
+				if (addZip)
+					updateFiles.Add(module.Key);
+				else
+				{
+					foreach(var file in module.Value)
+						updateFiles.Add(file.Path);
+				}
+			}
+
+			return updateFiles;
+		}
+
+		static string ComputeHash(string path)
 		{
 			try
 			{
@@ -85,18 +136,16 @@ namespace Update
 				using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
 				{
 					foreach (Byte hashByte in Hasher.ComputeHash(f))
-					{
 						localHash.Append(string.Format("{0:x2}", hashByte));
-					}
 				}
 				return localHash.ToString();
 			}
 			catch { return null; }
 		}
 
-		public List<string> GetFileList()
+		List<FileInfo> GetFileList()
 		{
-			List<string> files = new List<string>();
+			List<FileInfo> files = new List<FileInfo>();
 			var globalDependencies = from dependency in _settings.Descendants("Dependency").Attributes("Module")
 									 where dependency.Parent.Parent == _settings.Root
 									 select dependency.Value;
@@ -107,16 +156,23 @@ namespace Update
 			return files;
 		}
 
-		void GetModuleFiles(string moduleName, ICollection<string> files)
+		void GetModuleFiles(string moduleName, ICollection<FileInfo> files)
 		{
-			var moduleFiles = _settings.Descendants("Module").Where(
-									module => module.Attribute("Name").Value == moduleName
-								).First().Descendants("File").Select(file => file.Attribute("Path").Value);
+			XElement module = _settings.Descendants("Module").Where( m => m.Attribute("Name").Value == moduleName).First();
+			var moduleFiles = module.Descendants("File").Select(file => new FileInfo{
+         		Path = file.Attribute("Path").Value,
+				Zip = module.Attribute("Zip") == null ? "" : module.Attribute("Zip").Value
+         	});
 
-			foreach (var file in moduleFiles)
+			if (moduleFiles.Count() == 0 && module.Attribute("Zip") != null)
+				files.Add(new FileInfo { Path = module.Attribute("Zip").Value, Zip = ""});
+			else
 			{
-				if (file == string.Empty || files.Contains(file)) continue;
-				files.Add(file);
+				foreach (var file in moduleFiles)
+				{
+					if (file.Path == string.Empty || files.Contains(file)) continue;
+					files.Add(file);
+				}
 			}
 
 			var dependencies = from dependency in _settings.Descendants("Dependency")

@@ -26,7 +26,7 @@ namespace AppInfoCreator
 			catch { return null; }
 		}
 
-		static void Main(string[] args)
+		static void Main()
 		{
 			StreamWriter output = new StreamWriter("files.txt");
 
@@ -35,10 +35,12 @@ namespace AppInfoCreator
 			List<FileInfo> files = new List<FileInfo>();
 			files.AddRange(dir.GetFiles("*.dll"));
 			files.AddRange(dir.GetFiles("*.zip"));
+			files.AddRange(dir.GetFiles("*.exe"));
 
 			foreach(var file in files)
 			{
-				output.WriteLine("{0} {1}", ComputeHash(file.FullName) , file.Name);
+				FileInfo info = new FileInfo(file.FullName);
+				output.WriteLine("{0} {1} {2}", ComputeHash(file.FullName) , file.Name, info.Length);
 			}
 
 			output.Close();

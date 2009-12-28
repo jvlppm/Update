@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Update
 {
-	class Program
+	static class Program
 	{
 		static void Main()
 		{
@@ -20,7 +20,7 @@ namespace Update
 				{
 					updater.DownloadFile(file);
 					if(file.EndsWith(".zip"))
-						Zip.UnZipFiles(file, ".", "", false);
+						Zip.UnZipFiles(file, ".", "", true);
 
 					double atualPercentage = updatedFiles++ / ((double)updateFiles.Count);
 					for (int i = 1; i < (atualPercentage - lastUpdate) * maxBarSize; i++)
