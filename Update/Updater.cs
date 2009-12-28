@@ -15,6 +15,7 @@ namespace Update
 		public long Size { get; set; }
 		public string Path { get; set; }
 		public string Zip { get; set; }
+		public bool CheckUpdates { get; set; }
 	}
 
 	public class Updater
@@ -85,15 +86,15 @@ namespace Update
 			foreach (FileInfo file in GetFileList())
 			{
 				if (!_serverFileInfos.ContainsKey(file.Path))
-					throw new Exception("File not available in server info: \"" + file + "\"");
+					throw new Exception("File not available in server info: \"" + file.Path + "\"");
 
-				if (ComputeHash(file.Path) != _serverFileInfos[file.Path].Hash)
-				{
-					if(!files.ContainsKey(file.Zip))
-						files.Add(file.Zip, new List<FileInfo>());
+				if(File.Exists(file.Path) && (!file.CheckUpdates || ComputeHash(file.Path) == _serverFileInfos[file.Path].Hash))
+					continue;
 
-					files[file.Zip].Add(file);
-				}
+				if(!files.ContainsKey(file.Zip))
+					files.Add(file.Zip, new List<FileInfo>());
+
+				files[file.Zip].Add(file);
 			}
 
 			return UpdateFileList(files);
@@ -129,18 +130,13 @@ namespace Update
 
 		static string ComputeHash(string path)
 		{
-			try
+			StringBuilder localHash = new StringBuilder();
+			using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
 			{
-				StringBuilder localHash = new StringBuilder();
-				if(!File.Exists(path)) return null;
-				using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
-				{
-					foreach (Byte hashByte in Hasher.ComputeHash(f))
-						localHash.Append(string.Format("{0:x2}", hashByte));
-				}
-				return localHash.ToString();
+				foreach (Byte hashByte in Hasher.ComputeHash(f))
+					localHash.Append(string.Format("{0:x2}", hashByte));
 			}
-			catch { return null; }
+			return localHash.ToString();
 		}
 
 		List<FileInfo> GetFileList()
@@ -161,6 +157,7 @@ namespace Update
 			XElement module = _settings.Descendants("Module").Where( m => m.Attribute("Name").Value == moduleName).First();
 			var moduleFiles = module.Descendants("File").Select(file => new FileInfo{
          		Path = file.Attribute("Path").Value,
+				CheckUpdates = file.Attribute("CheckUpdates") != null? bool.Parse(file.Attribute("CheckUpdates").Value): true,
 				Zip = module.Attribute("Zip") == null ? "" : module.Attribute("Zip").Value
          	});
 
