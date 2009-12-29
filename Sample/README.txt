@@ -2,7 +2,7 @@ Arquivo Settings.ini deve ser distribuído junto com o arquivo Update.exe
 
 O arquivo Settings.ini contém informação sobre onde está disponibilizada a última versão de cada arquivo a ser atualizado e possui o seguinte formato:
 [Update]
-BaseUrl=FilesLocation
+UpdateUrl=FilesLocation
 
 Este local informado no arquivo Settings.ini deve conter obrigatoriamente:
 

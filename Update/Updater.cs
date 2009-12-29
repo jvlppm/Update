@@ -18,46 +18,38 @@ namespace Update
 		public bool CheckUpdates { get; set; }
 	}
 
+	public class Module
+	{
+		public Module(string name)
+		{
+			Name = name;
+		}
+		public string Name { get; private set; }
+		public bool Enabled { get; set; }
+	}
+
 	public class Updater
 	{
+		#region Private Attributes
 		static readonly WebClient Client = new WebClient();
 		static readonly HashAlgorithm Hasher = new MD5CryptoServiceProvider();
 
 		readonly XDocument _modules;
 		readonly Dictionary<string, FileInfo> _serverFiles;
+		readonly string _updateUrl;
 
-		string BaseUrl { get; set; }
+		public List<Module> Modules { get; private set; }
+		#endregion
 
-		public Updater()
+		#region Public Methods
+		public Updater(string updateUrl)
 		{
-			BaseUrl = Settings.ReadValue("Update", "BaseUrl");
+			_updateUrl = updateUrl;
 
-			_modules = XDocument.Load(new StreamReader(Client.OpenRead(BaseUrl + "/Modules.xml")));
-			_serverFiles = GetServerFileInfos(BaseUrl + "/Files.txt");
-		}
+			_modules = XDocument.Load(new StreamReader(Client.OpenRead(_updateUrl + "/Modules.xml")));
+			_serverFiles = GetServerFileInfos(_updateUrl + "/Files.txt");
 
-		static Dictionary<string, FileInfo> GetServerFileInfos(string address)
-		{
-			Dictionary<string, FileInfo> fileInfos = new Dictionary<string, FileInfo>();
-			
-			address = address.TrimEnd('/');
-			try
-			{
-				StreamReader sr = new StreamReader(Client.OpenRead(address));
-
-				do
-				{
-					string[] line = sr.ReadLine().Split(' ');
-					fileInfos.Add(line[1], new FileInfo{ Hash = line[0], Size = long.Parse(line[2])});
-				}
-				while (!sr.EndOfStream);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Online application info could not be read.", ex);
-			}
-
-			return fileInfos;
+			Modules = GetModules();
 		}
 
 		public void DownloadFile(string file)
@@ -73,15 +65,18 @@ namespace Update
 
 			try
 			{
-				Client.DownloadFile(BaseUrl + "/" + file, file);
+				Client.DownloadFile(_updateUrl + "/" + file, file);
 			}
 			catch(Exception ex)
 			{
 				throw new Exception(string.Format("File could not be downloaded: \"{0}\"", file), ex);
 			}
+
+			if (file.EndsWith(".zip"))
+				Zip.UnZipFile(file, true);
 		}
 
-		public List<string> OutdatedFiles()
+		public List<string> GetUpdateFileList()
 		{
 			Dictionary<string, List<FileInfo>> files = new Dictionary<string, List<FileInfo>>();
 
@@ -100,6 +95,32 @@ namespace Update
 			}
 
 			return UpdateFileList(files);
+		}
+		#endregion
+
+		#region Private Methods
+		static Dictionary<string, FileInfo> GetServerFileInfos(string address)
+		{
+			Dictionary<string, FileInfo> fileInfos = new Dictionary<string, FileInfo>();
+
+			address = address.TrimEnd('/');
+			try
+			{
+				StreamReader sr = new StreamReader(Client.OpenRead(address));
+
+				do
+				{
+					string[] line = sr.ReadLine().Split(' ');
+					fileInfos.Add(line[1], new FileInfo { Hash = line[0], Size = long.Parse(line[2]) });
+				}
+				while (!sr.EndOfStream);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Online application info could not be read.", ex);
+			}
+
+			return fileInfos;
 		}
 
 		List<string> UpdateFileList(Dictionary<string, List<FileInfo>> modules)
@@ -141,23 +162,26 @@ namespace Update
 			return localHash.ToString();
 		}
 
+		List<Module> GetModules()
+		{
+			var modules =	from module in _modules.Descendants("Download")
+							select new Module(module.Attribute("Module").Value)
+							{
+								Enabled = module.Attribute("EnabledByDefault") == null || bool.Parse(module.Attribute("EnabledByDefault").Value)
+							};
+
+			return modules.ToList();
+		}
+
 		List<FileInfo> GetFileList()
 		{
 			List<FileInfo> files = new List<FileInfo>();
-			var globalDependencies =
-				_modules.Descendants("Download").Attributes("Module").Where(download =>
-					{
-						string localStatus = Settings.ReadValue(download.Value, "Enabled");
-						if (!string.IsNullOrEmpty(localStatus))
-							return bool.Parse(localStatus);
 
-						var serverStatus = download.Parent.Attribute("EnabledByDefault");
-						return serverStatus == null || bool.Parse(serverStatus.Value);
-					}
-				).Select(dependency => dependency.Value);
-
-			foreach (string globalDependency in globalDependencies)
-				GetModuleFiles(globalDependency, files);
+			foreach (Module module in Modules)
+			{
+				if (module.Enabled)
+					GetModuleFiles(module.Name, files);
+			}
 
 			return files;
 		}
@@ -190,5 +214,6 @@ namespace Update
 			foreach (string dependency in dependencies)
 				GetModuleFiles(dependency, files);
 		}
+		#endregion
 	}
 }

@@ -9,23 +9,33 @@ namespace Update
 		{
 			try
 			{
-				double lastUpdate = 0;
-				Updater updater = new Updater();
 				Console.Write("Loading => ");
-				int maxBarSize = Console.WindowWidth - Console.CursorLeft;
+				Updater updater = new Updater(Settings.ReadValue("Update", "UpdateUrl"));
 
-				int updatedFiles = 1;
-				List<string> updateFiles = updater.OutdatedFiles();
+				double lastUpdate = 0;
+				int maxBarSize = Console.WindowWidth - Console.CursorLeft;
+				int updatedFiles = 0;
+
+				#region Enable Optional Modules
+				foreach (var module in updater.Modules)
+				{
+					string customStatus = Settings.ReadValue(module.Name, "Enabled");
+					if (!string.IsNullOrEmpty(customStatus))
+						module.Enabled = bool.Parse(customStatus);
+				}
+				#endregion
+
+				List<string> updateFiles = updater.GetUpdateFileList();
 				foreach (string file in updateFiles)
 				{
 					updater.DownloadFile(file);
-					if(file.EndsWith(".zip"))
-						Zip.UnZipFiles(file, ".", "", true);
 
-					double atualPercentage = updatedFiles++ / ((double)updateFiles.Count);
+					#region Update ProgressBar
+					double atualPercentage = ++updatedFiles / ((double)updateFiles.Count);
 					for (int i = 1; i < (atualPercentage - lastUpdate) * maxBarSize; i++)
 						Console.Write("#");
 					lastUpdate = atualPercentage;
+					#endregion
 				}
 			}
 			catch(Exception ex)

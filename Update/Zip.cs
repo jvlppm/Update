@@ -6,26 +6,30 @@ namespace Update
 {
 	public static class Zip
 	{
-		public static void UnZipFiles(string zipPathAndFile, string outputFolder, string password, bool deleteZipFile)
+		public static void UnZipFile(string zipPath, bool deleteZip)
 		{
-			ZipInputStream s = new ZipInputStream(File.OpenRead(zipPathAndFile));
+			UnZipFiles(zipPath, ".", null, deleteZip);
+		}
+
+		static void UnZipFiles(string zipPath, string outputFolder, string password, bool deleteZipFile)
+		{
+			ZipInputStream zip = new ZipInputStream(File.OpenRead(zipPath));
 			if (!string.IsNullOrEmpty(password))
-				s.Password = password;
+				zip.Password = password;
 			ZipEntry theEntry;
-			while ((theEntry = s.GetNextEntry()) != null)
+			while ((theEntry = zip.GetNextEntry()) != null)
 			{
-				string directoryName = outputFolder;
 				string fileName = Path.GetFileName(theEntry.Name);
 
 				// create directory 
-				if (directoryName != "")
-					Directory.CreateDirectory(directoryName);
+				if (outputFolder != "")
+					Directory.CreateDirectory(outputFolder);
 				
 				if (fileName != String.Empty)
 				{
 					if (theEntry.Name.IndexOf(".ini") < 0)
 					{
-						string fullPath = directoryName + "\\" + theEntry.Name;
+						string fullPath = outputFolder + "\\" + theEntry.Name;
 						fullPath = fullPath.Replace("\\ ", "\\");
 						string fullDirPath = Path.GetDirectoryName(fullPath);
 						if (!Directory.Exists(fullDirPath)) Directory.CreateDirectory(fullDirPath);
@@ -34,7 +38,7 @@ namespace Update
 						byte[] data = new byte[size];
 						while (true)
 						{
-							size = s.Read(data, 0, data.Length);
+							size = zip.Read(data, 0, data.Length);
 							if (size <= 0)
 								break;
 							streamWriter.Write(data, 0, size);
@@ -43,9 +47,9 @@ namespace Update
 					}
 				}
 			}
-			s.Close();
+			zip.Close();
 			if (deleteZipFile)
-				File.Delete(zipPathAndFile);
+				File.Delete(zipPath);
 		}
 	}
 }
