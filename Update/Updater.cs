@@ -65,7 +65,8 @@ namespace Update
 
 			try
 			{
-				Client.DownloadFile(_updateUrl + "/" + file, file);
+				if (!File.Exists(file) || ComputeHash(file) != _serverFiles[file].Hash)
+					Client.DownloadFile(_updateUrl + "/" + file, file);
 			}
 			catch(Exception ex)
 			{
