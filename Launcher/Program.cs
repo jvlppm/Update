@@ -148,10 +148,13 @@ namespace Launcher
 				try
 				{
 					string pluginName = Regex.Replace(fileName, @"^Plugin\.([^\.]*).dll$", "$1");
-					string pluginStatus = Settings.ReadValue("Plugin", pluginName) ?? string.Empty;
+					string pluginStatus = Settings.ReadValue("Plugin", pluginName);
 
-					if (pluginStatus.ToLower() == "enabled")
-						PluginManager.LoadPlugin<Jv.Plugins.Plugin>(fileName);
+					if (string.IsNullOrEmpty(pluginStatus) || pluginStatus.ToLower() == "enabled")
+					{
+						PluginManager.LoadPlugin<Plugin>(fileName);
+						Settings.WriteValue("Plugin", pluginName, "enabled");
+					}
 					else
 						Settings.WriteValue("Plugin", pluginName, "disabled");
 				}
