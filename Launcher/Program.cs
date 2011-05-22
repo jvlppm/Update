@@ -36,6 +36,7 @@ namespace Launcher
 			});
 		}
 
+		[STAThread]
 		public static void Main(string[] args)
 		{
 			try
