@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csproj", "{143618F6-6711-41FB-B518-E0E6A487DCB7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppInfoCreator", "AppInfoCreator\AppInfoCreator.csproj", "{BCFD5F94-E44C-4B4B-B28E-110226C4C723}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher", "Launcher\Launcher.csproj", "{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{BCFD5F94-E44C-4B4B-B28E-110226C4C723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCFD5F94-E44C-4B4B-B28E-110226C4C723}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCFD5F94-E44C-4B4B-B28E-110226C4C723}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF54F892-6E51-47B7-B0A6-5CA8398FBD08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

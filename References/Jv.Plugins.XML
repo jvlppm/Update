@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jv.Plugins</name>
+    </assembly>
+    <members>
+        <member name="M:Jv.Plugins.Manager.LoadPlugin``1(System.String)">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.LoadPrivatePlugin``1(System.String)">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.LoadPlugin``1(System.Byte[])">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.LoadPrivatePlugin``1(System.Byte[])">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.LoadPlugin(Jv.Plugins.Plugin)">
+            <summary>
+            Carrega Plugin interno. Mensagens para o plugin são enviadas para o seu tipo Base.
+            </summary>
+            <param name="plugin">Plugin instanciado.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.LoadPrivatePlugin(Jv.Plugins.Plugin)">
+            <summary>
+            Carrega Plugin interno. Mensagens para o plugin são enviadas para o seu tipo Base.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <param name="plugin">Plugin instanciado.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.UnLoadPlugins``1">
+            <summary>
+            Descarrega plugins do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo dos Plugins (Base comum).</typeparam>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Jv.Plugins.Manager.UnLoadPlugin(Jv.Plugins.Plugin)" -->
+        <member name="M:Jv.Plugins.Manager.MessageToPlugin``1(System.Object)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.MessageToPlugin``1(System.String)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.MessageToPlugin``1(System.String,System.Object[])">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="format">Formato da mensagem (string.Format).</param>
+            <param name="args">argumentos da mensagem.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.MessageToPlugin(Jv.Plugins.Plugin,System.Object)">
+            <summary>
+            Envia mensagem diretamente ao plugin destination.
+            </summary>
+            <param name="destination">Plugin que receberá a mensagem.</param>
+            <param name="message">Mensagem a ser enviada.</param>
+        </member>
+        <member name="M:Jv.Plugins.Manager.GetPlugin``1">
+            <summary>
+            Acessa plugin carregado.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <exception cref="T:Jv.Plugins.Exceptions.MultipleInstances">Lançado quando mais de um Plugin do mesmo tipo foi carregado. Utilize GetPlugins.</exception>
+            <exception cref="T:Jv.Plugins.Exceptions.PluginNotAccessible">Lançado quando Plugins do tipo não foram encontrados.</exception>
+        </member>
+        <member name="M:Jv.Plugins.Manager.GetPlugins``1">
+            <summary>
+            Acessa plugins carregados.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base dos plugins carregados.</typeparam>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.OnException(System.Exception)">
+            <summary>
+            Chamado quando é lançada uma exceção ao receber uma mensagem.
+            </summary>
+            <param name="ex">Exception</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.OnLoad">
+            <summary>
+            Chamado após ser carregado por algum plugin.
+            </summary>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.BindMessage``1(Jv.Plugins.Plugin.Receive{``0})">
+            <summary>
+            Redireciona mensagens do tipo Type para a função callBack.
+            Estas mensagens não serão enviadas para o ReceiveMessage.
+            </summary>
+            <typeparam name="Type">Tipo da mensagems a serem redirecionadas.</typeparam>
+            <param name="callBack">Função que será chamada para mensagens do tipo Type.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.BindMessage``1(Jv.Plugins.Plugin.SimpleReceive)">
+            <summary>
+            Redireciona mensagens do tipo Type para a função callBack.
+            Estas mensagens não serão enviadas para o ReceiveMessage.
+            </summary>
+            <typeparam name="Type">Tipo das mensagens a serem redirecionadas.</typeparam>
+            <param name="callBack">Função que será chamada para mensagens do tipo Type.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.BindReturn``1(Jv.Plugins.Plugin.ReturnFunction{``0})">
+            <summary>
+            Função será executada quando for chamado ValueFromPlugin com tipo InfoType.
+            </summary>
+            <typeparam name="InfoType"></typeparam>
+            <param name="callBack"></param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.UnBindMessage``1">
+            <summary>
+            Remove redirecionamentos de mensagens do tipo Type.
+            </summary>
+            <typeparam name="Type"></typeparam>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPlugin``1(System.String)">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPrivatePlugin``1(System.String)">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="fileName">Arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPlugin``1(System.Byte[])">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="assemblyData">Conteúdo de arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPrivatePlugin``1(System.Byte[])">
+            <summary>
+            Carrega plugin do tipo PluginType.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <typeparam name="PluginType">Tipo do Plugin (Base).</typeparam>
+            <param name="assemblyData">Conteúdo de arquivo (.dll) onde a classe do tipo PluginType está definida.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPlugin(Jv.Plugins.Plugin)">
+            <summary>
+            Carrega Plugin interno. Mensagens para o plugin são enviadas para o seu tipo Base.
+            </summary>
+            <param name="plugin">Plugin instanciado.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.LoadPrivatePlugin(Jv.Plugins.Plugin)">
+            <summary>
+            Carrega Plugin interno. Mensagens para o plugin são enviadas para o seu tipo Base.
+            Plugin não estará acessível para outros plugins do mesmo nível.
+            </summary>
+            <param name="plugin">Plugin instanciado.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.UnLoadPlugins``1">
+            <summary>
+            Descarrega plugins do tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo dos Plugins (Base comum).</typeparam>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Jv.Plugins.Plugin.UnLoadPlugin(Jv.Plugins.Plugin)" -->
+        <member name="M:Jv.Plugins.Plugin.GetPlugin``1">
+            <summary>
+            Acessa plugin carregado.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <exception cref="T:Jv.Plugins.Exceptions.MultipleInstances">Lançado quando mais de um Plugin do mesmo tipo foi carregado. Utilize GetPlugins.</exception>
+            <exception cref="T:Jv.Plugins.Exceptions.PluginNotAccessible">Lançado quando Plugins do tipo não foram encontrados.</exception>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.GetPlugins``1">
+            <summary>
+            Acessa plugins carregados.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base dos plugins carregados.</typeparam>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.MessageToPlugin``1(System.Object)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.MessageToPlugin``1(System.String)">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="message">Mensagem a ser recebida pelos plugins.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.MessageToPlugin``1(System.String,System.Object[])">
+            <summary>
+            Envia mensagem para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+            <param name="format">Formato da mensagem (string.Format).</param>
+            <param name="args">argumentos da mensagem.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.MessageToPlugin(Jv.Plugins.Plugin,System.Object)">
+            <summary>
+            Envia mensagem diretamente ao plugin destination.
+            </summary>
+            <param name="destination">Plugin que receberá a mensagem.</param>
+            <param name="message">Mensagem a ser enviada.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.ValueFromPlugin(Jv.Plugins.Plugin,System.Object)">
+            <summary>
+            Realiza chamada de requisição de valor de um Plugin.
+            </summary>
+            <param name="destination">Plugin que contém a informação.</param>
+            <param name="key">Objeto que representa a informação requisitada.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Jv.Plugins.Plugin.ValueFromPlugin``1(System.Object)" -->
+        <member name="M:Jv.Plugins.Plugin.ReSendMessage``1">
+            <summary>
+            Re-Envia mensagem recebida para os plugins de tipo PluginType.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.ReSendMessageContent``1">
+            <summary>
+            Re-Envia conteudo da mensagem recebida para os plugins de tipo PluginType.
+            Mensagem recebida deve ser um Messages.Plugins.PackedMessage.
+            </summary>
+            <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.ReSendMessage(Jv.Plugins.Plugin)">
+            <summary>
+            Re-Envia mensagem recebida para o plugin destination.
+            </summary>
+            <param name="destination">Plugin instanciado.</param>
+        </member>
+        <member name="M:Jv.Plugins.Plugin.ReSendMessageContent(Jv.Plugins.Plugin)">
+            <summary>
+            Re-Envia conteudo da mensagem recebida para o plugin destination.
+            </summary>
+            <param name="destination">Plugin instanciado.</param>
+        </member>
+        <member name="P:Jv.Plugins.Plugin.Parent">
+            <summary>
+            Plugin "pai".
+            Obs.: Válido apenas após o construtor.
+            </summary>
+        </member>
+    </members>
+</doc>

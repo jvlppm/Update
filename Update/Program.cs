@@ -84,7 +84,13 @@ namespace Update
 			}
 			catch(Exception ex)
 			{
+				Exception inner = ex.InnerException;
 				Console.WriteLine("Error: {0}", ex.Message);
+				while (inner != null)
+				{
+					Console.WriteLine(inner.Message);
+					inner = inner.InnerException;
+				}
 				Console.ReadKey();
 			}
 		}

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jv.Threading</name>
+    </assembly>
+    <members>
+        <member name="M:Jv.Threading.Collections.SyncStack.Push(System.Object)">
+            <summary>
+            Adds an object to the end of the Jv.Threading.SyncQueue and releases any thread waiting in Dequeue.
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Jv.Threading.Collections.SyncStack.Pop">
+            <summary>
+            Waits for a item and returns the object at the beginning of the Jv.Threading.SyncQueue.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Jv.Threading.Collections.SyncStack.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>
+            An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:Jv.Threading.Collections.SyncQueue.Enqueue(System.Object)">
+            <summary>
+            Adds an object to the end of the Jv.Threading.SyncQueue and releases any thread waiting in Dequeue.
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Jv.Threading.Collections.SyncQueue.Dequeue">
+            <summary>
+            Waits for a item and returns the object at the beginning of the Jv.Threading.SyncQueue.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Jv.Threading.Collections.SyncQueue.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>
+            An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+    </members>
+</doc>

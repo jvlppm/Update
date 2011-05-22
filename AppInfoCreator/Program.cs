@@ -5,18 +5,17 @@ using System.Text;
 
 namespace AppInfoCreator
 {
-	class Program
+	static class Program
 	{
 		static readonly HashAlgorithm Hasher = new MD5CryptoServiceProvider();
-		public static string ComputeHash(string path)
+
+		static string ComputeHash(string path)
 		{
 			StringBuilder localHash = new StringBuilder();
 			using (FileStream f = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 8192))
 			{
 				foreach (byte hashByte in Hasher.ComputeHash(f))
-				{
 					localHash.Append(string.Format("{0:x2}", hashByte));
-				}
 			}
 			return localHash.ToString();
 		}
